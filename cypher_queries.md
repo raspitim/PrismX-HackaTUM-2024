@@ -128,3 +128,30 @@ WHERE (s)-[]->(d) OR (s)-[]->(d_cli) OR (s)-[]->(d_desktop)
 RETURN DISTINCT s.key as Key, s.state as State, s.critical as Critical, s.provider_name as Providername, s.type as Type, s.sub_type as Subtype ORDER BY Critical DESC, State DESC
 
 ```
+
+## Query to produce ChatGPT Prompt to create Solution Roadmap
+```sql
+OPTIONAL MATCH 
+  (d:SoftwareInstallation {product: "Docker Engine"})
+WHERE 
+  toFloat(d.version) >= 23.0 AND toFloat(d.version) <= 26.1
+
+OPTIONAL MATCH 
+  (d_cli:SoftwareInstallation {product: "Docker CLI"})
+WHERE 
+  toFloat(d_cli.version) >= 23.0 AND toFloat(d_cli.version) <= 26.1
+
+OPTIONAL MATCH 
+  (d_desktop:SoftwareInstallation {product: "Docker Desktop"})
+WHERE 
+  d_desktop.version >= "4.10.1" AND d_desktop.version <= "4.34.2"
+MATCH (s:System)-[r]->(:SoftwareInstallation)
+WHERE (s)-[]->(d) OR (s)-[]->(d_cli) OR (s)-[]->(d_desktop)
+OPTIONAL MATCH (s)-[:related_weakness]->(w:Weakness)
+WHERE w.status CONTAINS "open"
+OPTIONAL MATCH (w)-[:related_weakness]->(v:Vulnerability)
+RETURN "List of possible Vulnerabilities (Please create a short Roadmap of what Measures should be taken): \n" +  apoc.text.join(COLLECT(DISTINCT "Title: " + w.title + " Severity: " + w.severity + " CVE: " + v.cve), "\n")
+
+```
+
+
