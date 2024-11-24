@@ -5,7 +5,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,13 +73,6 @@ public class API implements RequestHandler<Map<String, String>, String>{
         }
 
         return "Data loaded successfully!";
-    }
-
-    public static void main(String[] args) {
-        API api = new API();
-        Map<String, String> map = new HashMap<>();
-        map.put("cypherQuery", "MATCH (n:Person) RETURN n.name AS name");
-        System.out.println(api.handleRequest(map, null));
     }
 
     public static String chatGPT(String prompt) {
